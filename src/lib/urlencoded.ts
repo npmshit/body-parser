@@ -2,6 +2,7 @@
  * body-parser
  * Copyright(c) 2014 Jonathan Ong
  * Copyright(c) 2014-2015 Douglas Christopher Wilson
+ * Copyright(c) 2018 Zongmin Lei <leizongmin@gmail.com>
  * MIT Licensed
  */
 

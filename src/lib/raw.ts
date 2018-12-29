@@ -1,6 +1,7 @@
 /*!
  * body-parser
  * Copyright(c) 2014-2015 Douglas Christopher Wilson
+ * Copyright(c) 2018 Zongmin Lei <leizongmin@gmail.com>
  * MIT Licensed
  */
 
@@ -11,8 +12,7 @@
  */
 
 var bytes = require('bytes')
-var contentType = require('content-type')
-var debug = require('debug')('body-parser:text')
+var debug = require('debug')('body-parser:raw')
 var read = require('../read')
 var typeis = require('type-is')
 
@@ -20,25 +20,24 @@ var typeis = require('type-is')
  * Module exports.
  */
 
-module.exports = text
+module.exports = raw
 
 /**
- * Create a middleware to parse text bodies.
+ * Create a middleware to parse raw bodies.
  *
  * @param {object} [options]
  * @return {function}
  * @api public
  */
 
-function text (options) {
+function raw (options) {
   var opts = options || {}
 
-  var defaultCharset = opts.defaultCharset || 'utf-8'
   var inflate = opts.inflate !== false
   var limit = typeof opts.limit !== 'number'
     ? bytes.parse(opts.limit || '100kb')
     : opts.limit
-  var type = opts.type || 'text/plain'
+  var type = opts.type || 'application/octet-stream'
   var verify = opts.verify || false
 
   if (verify !== false && typeof verify !== 'function') {
@@ -54,7 +53,7 @@ function text (options) {
     return buf
   }
 
-  return function textParser (req, res, next) {
+  return function rawParser (req, res, next) {
     if (req._body) {
       debug('body already parsed')
       next()
@@ -79,31 +78,13 @@ function text (options) {
       return
     }
 
-    // get charset
-    var charset = getCharset(req) || defaultCharset
-
     // read
     read(req, res, next, parse, debug, {
-      encoding: charset,
+      encoding: null,
       inflate: inflate,
       limit: limit,
       verify: verify
     })
-  }
-}
-
-/**
- * Get the charset of a request.
- *
- * @param {object} req
- * @api private
- */
-
-function getCharset (req) {
-  try {
-    return (contentType.parse(req).parameters.charset || '').toLowerCase()
-  } catch (e) {
-    return undefined
   }
 }
 
